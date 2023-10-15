@@ -1,0 +1,131 @@
+package com.example.demo.controllers;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.example.demo.model.Employee;
+import com.example.demo.services.EmployeeService;
+
+
+@RestController
+@RequestMapping("/employee")
+public class EmployeeRestController {
+
+	ArrayList<Employee> listEmployee = new ArrayList<>(
+			Arrays.asList(new Employee(1,"Mireia","", ""), new Employee(2,"Ana","", ""),
+					new Employee(3,"Fernando","", ""), new Employee(4,"Adrián","", "")));
+	
+
+	EmployeeService employeeService;
+
+
+	public EmployeeRestController(@Qualifier("general") EmployeeService employeeService) {
+		this.employeeService = employeeService;
+
+	}
+	
+	
+	
+	// EndPoints
+	@GetMapping
+	public ResponseEntity<?> getEmployee() {
+		ArrayList<Employee> listEmployee = employeeService.getAllEmployee();
+		return ResponseEntity.ok(listEmployee);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getEmployee(@PathVariable int id) {
+
+		if (id < 0) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		for (Employee e : listEmployee) {
+			if (e.getId() == id) {
+				return ResponseEntity.ok(e);
+			}
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+	@PostMapping
+	public ResponseEntity<?> createEmployee(Employee employee) {
+		Employee newPerson = this.employeeService.saveEmployee(employee);
+
+		// Recupera la ruta actual del endpoint y retorna la URL del nuevo recurso.
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(employee.getId())
+				.toUri();
+
+		return ResponseEntity.created(location).build();
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity deleteEmployee(@PathVariable int id) {
+
+		if (id < 0) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		for (Employee e : new ArrayList<>(listEmployee)) {
+			if (e.getId() == id) {
+				listEmployee.remove(e);
+				return ResponseEntity.noContent().build();
+			}
+
+		}
+
+		return ResponseEntity.notFound().build();
+
+	}
+
+	@PutMapping
+	public ResponseEntity<?> updateEmployee(@RequestBody @Validated Employee employee) {
+		for (Employee e : listEmployee) {
+			if (e.getId() == employee.getId()) {
+				e.setName(employee.getName());
+				e.setEmail(employee.getEmail());
+
+				return ResponseEntity.ok(e);
+			}
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}

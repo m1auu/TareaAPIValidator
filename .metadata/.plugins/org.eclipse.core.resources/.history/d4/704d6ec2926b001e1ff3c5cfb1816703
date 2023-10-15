@@ -1,0 +1,28 @@
+package com.example.demo.services;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.example.demo.model.Employee;
+
+public class EmployeeServiceProImpl {
+	
+	ArrayList<Employee> listEmployeePro = new ArrayList<>(
+			Arrays.asList(new Employee(1,"Mireia","", ""), new Employee(2,"Ana","", ""),
+					new Employee(3,"Fernando","", ""), new Employee(4,"Adrián","", "")));
+	
+	public EmployeeServiceProImpl() {
+		log.info("");
+	}
+
+	public ArrayList<Employee> getAllEmployee() {
+		return listEmployeePro;
+	}
+
+	public Employee savePersona (Employee employee) {
+		this.listEmployeePro.add(employee);
+		return employee;
+	}
+
+
+}

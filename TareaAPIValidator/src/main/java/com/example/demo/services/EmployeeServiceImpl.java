@@ -1,0 +1,37 @@
+package com.example.demo.services;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Employee;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+//@Primary
+@Service("general")
+
+public class EmployeeServiceImpl implements EmployeeService {
+
+		
+		ArrayList<Employee> listEmployee = new ArrayList<>(
+				Arrays.asList(new Employee(1,"Mireia","", ""), new Employee(2,"Ana","", ""),
+						new Employee(3,"Fernando","", ""), new Employee(4,"Adrián","", "")));
+
+		
+		public EmployeeServiceImpl() {
+		}
+		
+		@Override
+		public ArrayList<Employee> getAllEmployee() {
+			return listEmployee;
+		}
+
+		@Override
+		public Employee saveEmployee(Employee employee) {
+			this.listEmployee.add(employee);
+			return employee;
+		}
+
+}

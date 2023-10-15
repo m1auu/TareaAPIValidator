@@ -1,0 +1,126 @@
+package com.example.demo.controllers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Employee;
+
+@RestController
+@RequestMapping("/employee")
+public class EmployeeRestController {
+
+	ArrayList<Employee> listEmployee = new ArrayList<>(
+			Arrays.asList(new Employee(1,"Mireia","mireia@gmail.com", ""), new Employee(2,"Ana","ana@gmail.com", ""),
+					new Employee(3,"Fernando","fernando@gmail.com", ""), new Employee(4,"Adrián","adrian@gmail.com", "")));
+	
+	
+	
+	// @Autowired DI - Caso 1. No recomendado ya que dificulta las pruebas unitarias
+	EmployeeService employeeService;
+
+	// DI - caso 2. Recomendado por las pruebas unitarias
+	// Si uso la desambiguación por properties, debo quitar el qualifier
+	public PersonaRestController(@Qualifier("generales") PersonaService personaService) {
+		this.personaService = personaService;
+
+	}
+	
+	
+	
+	// EndPoints
+	@GetMapping
+	public ResponseEntity<?> getPersonas() {
+		ArrayList<Employee> listEmployee = employeeService.getAllPersonas();
+		return ResponseEntity.ok(listaPersonas);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getPersona(@PathVariable int id) {
+
+		if (id < 0) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		for (Persona p : listaPersonas) {
+			if (p.getId() == id) {
+				return ResponseEntity.ok(p);
+			}
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+	@PostMapping
+	public ResponseEntity<?> createPersona(@RequestBody @Validated(OnCreate.class) Persona persona) {
+		//listaPersonas.add(persona);
+		Persona newPerson = this.personaService.savePersona(persona);
+
+		// recupera la ruta actual del endpoint y retorna la url del nuevo recurso.
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(persona.getId())
+				.toUri();
+
+		return ResponseEntity.created(location).build(); //opción sin devolver el recurso creado
+		//return ResponseEntity.created(location).body(newPerson); //opción devolviendo tb el recurso creado.
+		//return new ResponseEntity<>(persona, HttpStatus.CREATED); usando HttpStatus directamente (implementación más antigua)
+
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity deletePersona(@PathVariable int id) {
+
+		if (id < 0) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		for (Persona p : new ArrayList<>(listaPersonas)) {
+			if (p.getId() == id) {
+				listaPersonas.remove(p);
+				return ResponseEntity.noContent().build();
+			}
+
+		}
+
+		return ResponseEntity.notFound().build();
+
+	}
+
+	@PutMapping
+	public ResponseEntity<?> updatePersona(@RequestBody @Validated Persona persona) {
+		for (Persona p : listaPersonas) {
+			if (p.getId() == persona.getId()) {
+				p.setName(persona.getName());
+				p.setLastName(persona.getLastName());
+				p.setAge(persona.getAge());
+
+				return ResponseEntity.ok(p);
+			}
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}

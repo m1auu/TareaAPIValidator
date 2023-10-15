@@ -1,0 +1,15 @@
+package com.example.demo.services;
+
+import java.util.ArrayList;
+import com.example.demo.model.Employee;
+
+public class EmployeeService {
+
+	public interface PersonaService {
+		
+		public ArrayList<Employee> getAllEmployee();
+		
+		public Employee saveEmployee(Employee employee);
+
+	}
+}
